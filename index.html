@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeSpace — You are not alone</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0e17;--bg2:#1a1828;--bg3:#252338;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#e8e6f0;--muted:#8b88a0;--accent:#7c6ff7;--accent2:#a89cf7;--adim:rgba(124,111,247,0.15);--teal:#4ecdc4;--tdim:rgba(78,205,196,0.12);--amber:#ffc864;--adim2:rgba(255,200,100,0.12);--coral:#ff6b9d;--danger:#ff6b6b;--success:#51cf66;--serif:'DM Serif Display',serif;--sans:'DM Sans',sans-serif;--rad:14px;--rads:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+input,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rads);padding:11px 14px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none;transition:border-color .2s}
+input:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{resize:none;line-height:1.6}
+.btn{cursor:pointer;font-family:var(--sans);font-size:14px;font-weight:500;padding:11px 20px;border-radius:var(--rads);border:1px solid var(--border2);background:transparent;color:var(--text);transition:all .2s;white-space:nowrap}
+.btn:hover{background:var(--bg3)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#6a5ee8}
+.btn.full{width:100%}
+.btn.sm{padding:7px 14px;font-size:13px}
+.btn.teal{background:var(--tdim);border-color:rgba(78,205,196,0.3);color:var(--teal)}
+.btn.ghost{background:transparent;border-color:rgba(255,255,255,0.2);color:var(--text)}
+.btn.ghost:hover{background:rgba(255,255,255,0.05)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.hint{font-size:11px;color:var(--muted);margin-top:8px;text-align:center}
+.err{color:var(--danger);font-size:12px;margin-top:6px}
+.ok-msg{color:var(--success);font-size:12px;margin-top:6px}
+.logo{font-family:var(--serif);font-size:2rem;color:var(--text);letter-spacing:-.5px}
+.logo span{color:var(--accent2);font-style:italic}
+.cwrap{align-items:center;justify-content:center;padding:2rem 1.5rem;background:radial-gradient(ellipse at 30% 20%,rgba(124,111,247,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(78,205,196,.08) 0%,transparent 50%),var(--bg)}
+.card{width:100%;max-width:440px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:2.5rem 2rem}
+.card.wide{max-width:560px}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+.tab{padding:8px 16px;font-size:13px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.pdots{display:flex;gap:6px;justify-content:center;margin-bottom:1.5rem}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);transition:all .3s}
+.pdot.done{background:var(--accent);border-color:var(--accent)}
+.pdot.active{background:var(--adim);border-color:var(--accent);transform:scale(1.2)}
+.choice-grid{display:flex;flex-wrap:wrap;gap:8px}
+.cbtn{padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--sans);transition:all .2s}
+.cbtn:hover{border-color:var(--accent);color:var(--accent2)}
+.cbtn.sel{background:var(--adim);border-color:var(--accent);color:var(--accent2)}
+#s-land{background:var(--bg);overflow-y:auto}
+.land-nav{display:flex;justify-content:space-between;align-items:center;padding:1.5rem 2rem;border-bottom:1px solid var(--border)}
+.land-nav-links{display:flex;gap:8px}
+.land-hero{text-align:center;padding:5rem 2rem 4rem;max-width:700px;margin:0 auto}
+.land-hero h1{font-family:var(--serif);font-size:3.2rem;font-weight:400;line-height:1.2;margin-bottom:1.2rem;letter-spacing:-.5px}
+.land-hero h1 em{color:var(--accent2);font-style:italic}
+.land-hero p{font-size:1.05rem;color:var(--muted);line-height:1.8;margin-bottom:2rem;max-width:520px;margin-left:auto;margin-right:auto}
+.land-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.land-features{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;padding:3rem 2rem;max-width:900px;margin:0 auto}
+.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rad);padding:1.5rem}
+.feat-icon{font-size:1.5rem;margin-bottom:12px}
+.feat-title{font-family:var(--serif);font-size:1.1rem;font-weight:400;margin-bottom:8px}
+.feat-text{font-size:13px;color:var(--muted);line-height:1.7}
+.land-quote{background:var(--bg2);border-left:3px solid var(--accent);padding:2rem;margin:2rem auto;border-radius:0 var(--rad) var(--rad) 0;max-width:600px}
+.land-quote p{font-family:var(--serif);font-size:1.2rem;font-style:italic;color:var(--text);line-height:1.7;margin-bottom:8px}
+.land-quote cite{font-size:12px;color:var(--muted)}
+.land-crisis{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);border-radius:var(--rad);padding:1.5rem 2rem;margin:2rem auto;max-width:600px;text-align:center}
+.land-crisis p{font-size:13px;color:#ffb3b3;line-height:1.7}
+.land-crisis strong{color:var(--danger)}
+.land-footer{text-align:center;padding:2rem;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.land-footer a{color:var(--muted);text-decoration:none;margin:0 8px;cursor:pointer}
+.land-footer a:hover{color:var(--accent2)}
+#s-about,#s-terms{background:var(--bg);overflow-y:auto}
+.about-wrap,.terms-wrap{max-width:680px;margin:0 auto;padding:3rem 2rem}
+.about-back{display:flex;align-items:center;gap:8px;color:var(--muted);cursor:pointer;font-size:13px;margin-bottom:2rem}
+.about-back:hover{color:var(--accent2)}
+.about-wrap h1,.terms-wrap h1{font-family:var(--serif);font-size:2.2rem;font-weight:400;margin-bottom:1.5rem;line-height:1.2}
+.about-wrap h2{font-family:var(--serif);font-size:1.4rem;font-weight:400;margin:2rem 0 1rem;color:var(--accent2)}
+.terms-wrap h2{font-size:11px;font-weight:500;color:var(--accent2);margin:1.5rem 0 .5rem;text-transform:uppercase;letter-spacing:.5px}
+.about-wrap p,.terms-wrap p{font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:1rem}
+.about-wrap p strong,.terms-wrap p strong{color:var(--text)}
+.about-highlight{background:var(--adim);border:1px solid rgba(124,111,247,.2);border-radius:var(--rad);padding:1.5rem;margin:1.5rem 0}
+.about-highlight p{color:var(--text);font-size:14px;line-height:1.8;margin:0}
+.crisis-modal-wrap{display:none;min-height:100vh;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:2rem;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000}
+.crisis-modal-wrap.open{display:flex}
+.crisis-modal{background:var(--bg2);border:1px solid rgba(255,107,107,.4);border-radius:20px;padding:2.5rem 2rem;max-width:480px;width:100%}
+.crisis-modal h2{font-family:var(--serif);font-size:1.6rem;font-weight:400;margin-bottom:1rem}
+.crisis-modal p{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:1rem}
+.crisis-line{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);border-radius:var(--rads);padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.crisis-line-name{font-size:13px;color:var(--text);font-weight:500}
+.crisis-line-num{font-size:13px;color:var(--danger);font-weight:500}
+#s-dash{background:var(--bg)}
+.dash-layout{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:230px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:1.5rem 1rem}
+.sidebar .logo{font-size:1.4rem;margin-bottom:6px;padding:0 4px}
+.uinfo{padding:0 4px;margin-bottom:1.5rem}
+.uname{font-size:13px;font-weight:500}
+.uday{font-size:11px;color:var(--muted);margin-top:2px}
+.tpill{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;margin-top:4px}
+.tpill.free{background:rgba(81,207,102,.15);color:var(--success)}
+.tpill.trial{background:var(--adim2);color:var(--amber)}
+.tpill.pro{background:var(--adim);color:var(--accent2)}
+.nav{flex:1}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rads);cursor:pointer;color:var(--muted);font-size:14px;transition:all .2s;margin-bottom:2px}
+.ni:hover{background:var(--bg3);color:var(--text)}
+.ni.active{background:var(--adim);color:var(--accent2)}
+.nicon{font-size:15px;width:20px;text-align:center}
+.sbot{padding-top:1rem;border-top:1px solid var(--border)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.mhead{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mhead h1{font-family:var(--serif);font-size:1.3rem;font-weight:400}
+.mbody{flex:1;overflow-y:auto;padding:1.5rem}
+.crisis-bar{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.4);border-radius:var(--rads);padding:14px 16px;margin-bottom:14px;font-size:13px;color:#ffb3b3;line-height:1.7;display:none}
+.crisis-bar strong{color:var(--danger)}
+.crisis-bar a{color:var(--danger);cursor:pointer;text-decoration:underline}
+.chat-wrap{display:flex;flex-direction:column;height:100%}
+.msgs{flex:1;overflow-y:auto;padding:0 0 1rem;display:flex;flex-direction:column;gap:8px}
+.msg{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.7;max-width:82%;white-space:pre-line}
+.msg.assistant{background:var(--bg2);border:1px solid var(--border);border-radius:16px 16px 16px 4px}
+.msg.user{background:var(--adim);border:1px solid rgba(124,111,247,.25);color:var(--accent2);border-radius:16px 16px 4px 16px;align-self:flex-end}
+.thinking{display:flex;gap:5px;align-items:center;padding:12px 16px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:pulse 1.3s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+.cinput{padding-top:1rem;border-top:1px solid var(--border);flex-shrink:0}
+.crow{display:flex;gap:8px}
+.crow textarea{flex:1;min-height:52px;max-height:120px}
+.cicard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rad);padding:1.5rem;margin-bottom:1rem}
+.cicard h2{font-family:var(--serif);font-size:1.2rem;font-weight:400;margin-bottom:1rem}
+.mgrid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.2rem}
+.mbtn{padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--sans);transition:all .2s}
+.mbtn:hover{border-color:var(--accent);color:var(--accent2)}
+.mbtn.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+.ciresp{background:var(--tdim);border:1px solid rgba(78,205,196,.2);border-radius:var(--rads);padding:14px 16px;font-size:14px;line-height:1.7;color:var(--teal);display:none;margin-top:1rem}
+.bsec{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rad);padding:1.5rem;margin-bottom:1rem}
+.bsec h2{font-family:var(--serif);font-size:1.2rem;font-weight:400;margin-bottom:1rem}
+.tcard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rads);padding:1rem;margin-bottom:8px}
+.tlabel{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.tlabel.belief{color:var(--coral)}.tlabel.avoiding{color:var(--amber)}.tlabel.patterns{color:var(--accent2)}
+.ttext{font-size:13px;line-height:1.7}
+.bnarr{font-size:14px;line-height:1.8;margin-bottom:1rem}
+.bempty{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:14px}
+.bempty p{margin-bottom:1rem;line-height:1.7}
+.bgen{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:1rem 0}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.2rem}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rads);padding:1rem;text-align:center}
+.snum{font-family:var(--serif);font-size:2rem;color:var(--accent2)}
+.slbl{font-size:11px;color:var(--muted);margin-top:2px}
+.psec{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rad);padding:1.5rem;margin-bottom:1rem}
+.psec h2{font-family:var(--serif);font-size:1.1rem;font-weight:400;margin-bottom:1.2rem}
+.prow{margin-bottom:14px}
+.plrow{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:5px}
+.pbar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:2px;transition:width .6s ease}
+.bsum{background:var(--adim);border:1px solid rgba(124,111,247,.2);border-radius:var(--rad);padding:1.2rem;margin-bottom:1rem;cursor:pointer}
+.bsum:hover{background:rgba(124,111,247,.2)}
+.bsuml{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--accent2);margin-bottom:6px}
+.mlog{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rad);padding:1.5rem}
+.mlog h2{font-family:var(--serif);font-size:1.1rem;font-weight:400;margin-bottom:1rem}
+.mentry{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.mentry:last-child{border-bottom:none}
+.uhero{text-align:center;margin-bottom:2rem}
+.uhero h1{font-family:var(--serif);font-size:2rem;font-weight:400;margin-bottom:8px}
+.uhero p{color:var(--muted);font-size:14px;line-height:1.7}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem}
+.pcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rad);padding:1.5rem}
+.pcard.feat{border-color:var(--accent);background:rgba(124,111,247,.05)}
+.pname{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
+.pprice{font-family:var(--serif);font-size:2.2rem;margin-bottom:4px}
+.pprice span{font-size:14px;font-family:var(--sans);color:var(--muted)}
+.pper{font-size:12px;color:var(--muted);margin-bottom:1.2rem}
+.pfeats{list-style:none}
+.pfeats li{font-size:13px;color:var(--muted);padding:4px 0;display:flex;align-items:center;gap:8px}
+.pfeats li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--bg3);flex-shrink:0}
+.pfeats li.on{color:var(--text)}
+.pfeats li.on::before{background:var(--accent2)}
+#s-loading{align-items:center;justify-content:center;background:var(--bg);text-align:center}
+#s-loading .logo{font-size:2rem;margin-bottom:1rem}
+.ldots{display:flex;gap:8px;justify-content:center;margin-top:1rem}
+@media(max-width:640px){.sidebar{display:none}.pgrid{grid-template-columns:1fr}.land-features{grid-template-columns:1fr}.land-hero h1{font-size:2.2rem}}
+</style>
+</head>
+<body>
+
+<div class="crisis-modal-wrap" id="crisis-modal">
+  <div class="crisis-modal">
+    <h2>You matter. We're here.</h2>
+    <p>If you're having thoughts of ending your life or harming yourself, please reach out right now. These services are free, confidential, and available 24/7.</p>
+    <div class="crisis-line"><span class="crisis-line-name">Lifeline Australia</span><span class="crisis-line-num">13 11 14</span></div>
+    <div class="crisis-line"><span class="crisis-line-name">Beyond Blue</span><span class="crisis-line-num">1300 22 4636</span></div>
+    <div class="crisis-line"><span class="crisis-line-name">Suicide Call Back Service</span><span class="crisis-line-num">1300 659 467</span></div>
+    <div class="crisis-line"><span class="crisis-line-name">Crisis Text Line</span><span class="crisis-line-num">Text HOME to 741741</span></div>
+    <p style="margin-top:1rem;font-size:13px">This pain is real. It is also not permanent.</p>
+    <textarea id="crisis-msg-input" rows="3" placeholder="If you want to tell us what's happening, we're listening..." style="margin:1rem 0"></textarea>
+    <button class="btn primary full" onclick="sendCrisisMsg()" style="background:var(--danger);border-color:var(--danger);margin-bottom:8px">Send message to mentor</button>
+    <button class="btn full" onclick="closeCrisisModal()">I'm okay — go back</button>
+  </div>
+</div>
+
+<div id="s-loading" class="screen active">
+  <div class="logo">Safe<span>Space</span></div>
+  <div style="font-size:13px;color:var(--muted)">Loading...</div>
+  <div class="ldots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
+<div id="s-land" class="screen">
+  <nav class="land-nav">
+    <div class="logo" style="font-size:1.5rem">Safe<span>Space</span></div>
+    <div class="land-nav-links">
+      <button class="btn ghost sm" onclick="show('s-about')">Our story</button>
+      <button class="btn ghost sm" onclick="show('s-terms')">Terms</button>
+      <button class="btn sm" onclick="show('s-auth');atab('in')">Sign in</button>
+      <button class="btn primary sm" onclick="show('s-auth');atab('up')">Get started</button>
+    </div>
+  </nav>
+  <div class="land-hero">
+    <h1>You are not alone.<br><em>Break the loop.</em><br>Become who you were meant to be.</h1>
+    <p>SafeSpace is peer support built by someone who lost everything — business, marriage, savings, identity — and rebuilt from nothing. Not therapy. Not an app. A mentor who actually gets it.</p>
+    <div class="land-cta">
+      <button class="btn primary" onclick="show('s-auth');atab('up')" style="padding:14px 32px;font-size:15px">Start free — no card needed</button>
+      <button class="btn ghost" onclick="show('s-about')" style="padding:14px 24px">Read our story</button>
+    </div>
+  </div>
+  <div class="land-features">
+    <div class="feat-card"><div class="feat-icon">◎</div><div class="feat-title">An AI mentor that knows you</div><div class="feat-text">Builds a deep profile from everything you share — your patterns, your loops, your hidden truths — and uses it to give you responses that are actually about you.</div></div>
+    <div class="feat-card"><div class="feat-icon">○</div><div class="feat-title">Daily check-ins that matter</div><div class="feat-text">A simple mood check-in that the AI responds to with warmth and precision. Not a wellness tracker. A daily moment of being genuinely seen.</div></div>
+    <div class="feat-card"><div class="feat-icon">◈</div><div class="feat-title">Your hidden truth profile</div><div class="feat-text">The AI generates a deep analysis of what's really going on underneath — your core beliefs, what you're avoiding, the patterns that keep repeating, and your specific path forward.</div></div>
+  </div>
+  <div class="land-quote"><p>"I lost everything I had spent 25 years building. The hardest part wasn't the loss — it was the loop my mind got stuck in. I built SafeSpace because nobody should have to find their way through that alone."</p><cite>— Antony, founder of SafeSpace</cite></div>
+  <div class="land-crisis"><p><strong>If you are in crisis right now</strong>, please call <strong>Lifeline on 13 11 14</strong> or <strong>Beyond Blue on 1300 22 4636</strong>. Free, confidential, 24/7.</p></div>
+  <div class="land-footer">
+    <div style="margin-bottom:8px"><a onclick="show('s-about')">About</a><a onclick="show('s-terms')">Terms &amp; Privacy</a><a onclick="openCrisisModal()" style="color:var(--danger)">Crisis support</a></div>
+    <div>© 2025 SafeSpace. Peer support — not clinical mental health treatment.</div>
+  </div>
+</div>
+
+<div id="s-about" class="screen">
+  <div class="about-wrap">
+    <div class="about-back" onclick="show('s-land')">← Back</div>
+    <h1>The story behind SafeSpace</h1>
+    <p>This platform was built by <strong>Antony</strong> — a concreter, businessman, father, and survivor based in Melbourne, Australia.</p>
+    <p>Over 25 years Antony built something real. Investment properties. A business. A family. A life that looked, from the outside, like it was working. Then in the space of a few years, almost all of it was gone — a marriage that ended, businesses that collapsed, savings wiped out by a partner who stole everything and fled the country.</p>
+    <p>What followed wasn't just financial devastation. It was the complete unravelling of identity. <strong>Who are you when everything you built is gone?</strong></p>
+    <div class="about-highlight"><p>"The overthinking was the worst part. Not the loss itself — the loop. The mind using thinking to avoid feeling. I'd lie awake at 3am going over the same territory for the hundredth time, getting nowhere, exhausted but unable to stop."</p></div>
+    <p>Antony is currently completing a Certificate IV in Mental Health and building SafeSpace from scratch — with no funding, no investors, and no safety net.</p>
+    <h2>Why peer support, not therapy</h2>
+    <p>Therapy is valuable. But for many people in the place Antony has been, it isn't accessible. SafeSpace is built on a different premise. <strong>The most powerful thing you can hear when you're stuck</strong> isn't advice from a professional. It's someone saying: I've been there. Actually there. And I found a way through.</p>
+    <h2>What SafeSpace is — and isn't</h2>
+    <p>SafeSpace is <strong>peer support and mentorship</strong>. It is not a substitute for clinical mental health treatment. If you are in crisis, please contact Lifeline on 13 11 14 or Beyond Blue on 1300 22 4636.</p>
+    <div style="margin-top:2rem;display:flex;gap:12px"><button class="btn primary" onclick="show('s-auth');atab('up')">Start free today</button><button class="btn ghost" onclick="show('s-land')">Back to home</button></div>
+  </div>
+</div>
+
+<div id="s-terms" class="screen">
+  <div class="terms-wrap">
+    <div class="about-back" onclick="show('s-land')">← Back</div>
+    <h1>Terms, Privacy &amp; Disclaimer</h1>
+    <p style="color:var(--accent2);font-size:13px">Plain English. No legal jargon. Just honest.</p>
+    <h2>What SafeSpace is</h2>
+    <p>SafeSpace is a peer support and mentorship platform. It is <strong>not a clinical mental health service, not therapy, and not a substitute for professional mental health care.</strong> If you are in crisis, please contact <strong>Lifeline on 13 11 14</strong>.</p>
+    <h2>What we collect</h2>
+    <p>When you create an account we collect your <strong>name, email address, and password</strong>. As you use the platform we store your <strong>conversation history, mood check-ins, and profile data</strong>. We do not sell your data. We do not share it with advertisers.</p>
+    <h2>How your data is protected</h2>
+    <p>Your data is stored in Supabase — a secure, encrypted database. Your conversations are private to you. No human reads your conversations unless you explicitly request a 1-on-1 session.</p>
+    <h2>Your rights</h2>
+    <p>You can delete your account and all data at any time by contacting us. You can export your data on request.</p>
+    <h2>Subscriptions and payments</h2>
+    <p>The free plan is free forever. The 7-day trial gives you full access at no cost. After the trial, Pro membership is <strong>$19 AUD per month</strong>. Cancel anytime. Payments processed securely through Stripe.</p>
+    <h2>Limitation of liability</h2>
+    <p>SafeSpace is a peer support tool. We are not liable for decisions made based on conversations with the AI mentor. If you are experiencing a mental health emergency, please contact emergency services immediately.</p>
+    <button class="btn ghost" onclick="show('s-land')" style="margin-top:1.5rem">← Back to home</button>
+  </div>
+</div>
+
+<div id="s-auth" class="screen cwrap">
+  <div class="card">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div class="logo" style="font-size:2.2rem">Safe<span>Space</span></div>
+      <div style="font-size:13px;color:var(--muted)">You are not alone. Let's find your way through.</div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab active" onclick="atab('in')">Sign in</div>
+      <div class="tab" onclick="atab('up')">Create account</div>
+    </div>
+    <div id="f-in">
+      <div class="field"><label>Email</label><input id="li-e" type="email" placeholder="your@email.com"/></div>
+      <div class="field"><label>Password</label><input id="li-p" type="password" placeholder="••••••••"/></div>
+      <div id="li-err" class="err" style="display:none;margin-bottom:8px"></div>
+      <button class="btn primary full" id="li-btn" onclick="login()">Sign in</button>
+      <div style="text-align:center;margin-top:12px"><span style="font-size:12px;color:var(--accent2);cursor:pointer" onclick="show('s-reset')">Forgot password?</span></div>
+    </div>
+    <div id="f-up" style="display:none">
+      <div class="field"><label>First name</label><input id="su-n" placeholder="Your name"/></div>
+      <div class="field"><label>Email</label><input id="su-e" type="email" placeholder="your@email.com"/></div>
+      <div class="field"><label>Password</label><input id="su-p" type="password" placeholder="Create a password (min 6 chars)"/></div>
+      <div class="field"><label>Confirm password</label><input id="su-p2" type="password" placeholder="Type it again"/></div>
+      <div id="su-err" class="err" style="display:none;margin-bottom:8px"></div>
+      <button class="btn primary full" id="su-btn" onclick="signup()">Start 7-day free trial</button>
+      <div class="hint">No credit card needed · Cancel anytime</div>
+      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--muted)">By signing up you agree to our <span style="color:var(--accent2);cursor:pointer" onclick="show('s-terms')">Terms &amp; Privacy</span></div>
+    </div>
+    <div style="text-align:center;margin-top:16px"><span style="font-size:12px;color:var(--muted);cursor:pointer" onclick="show('s-land')">← Back to home</span></div>
+  </div>
+</div>
+
+<div id="s-reset" class="screen cwrap">
+  <div class="card">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div class="logo" style="font-size:2rem">Safe<span>Space</span></div>
+      <div style="font-size:13px;color:var(--muted)">Reset your password</div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1.2rem;line-height:1.7">Enter your email and new password below.</p>
+    <div class="field"><label>Email</label><input id="reset-e" type="email" placeholder="your@email.com"/></div>
+    <div class="field"><label>New password</label><input id="reset-p" type="password" placeholder="New password (min 6 chars)"/></div>
+    <div class="field"><label>Confirm new password</label><input id="reset-p2" type="password" placeholder="Type it again"/></div>
+    <div id="reset-err" class="err" style="display:none;margin-bottom:8px"></div>
+    <div id="reset-ok" class="ok-msg" style="display:none;margin-bottom:8px"></div>
+    <button class="btn primary full" id="reset-btn" onclick="resetPw()">Reset password</button>
+    <div style="text-align:center;margin-top:12px"><span style="font-size:12px;color:var(--muted);cursor:pointer" onclick="show('s-auth')">← Back to sign in</span></div>
+  </div>
+</div>
+
+<div id="s-lock" class="screen cwrap">
+  <div class="card">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div class="logo" style="font-size:2.2rem">Safe<span>Space</span></div>
+      <div style="font-size:13px;color:var(--muted)">Welcome back. Your space is private.</div>
+    </div>
+    <div class="field"><label>Password</label><input id="lock-pw" type="password" placeholder="Enter your password to continue"/></div>
+    <div id="lock-err" class="err" style="display:none;margin-bottom:8px"></div>
+    <button class="btn primary full" onclick="unlockApp()">Enter SafeSpace</button>
+    <div style="text-align:center;margin-top:12px"><span style="font-size:12px;color:var(--muted);cursor:pointer" onclick="signout()">Sign in as someone else</span></div>
+  </div>
+</div>
+
+<div id="s-onboard" class="screen cwrap">
+  <div class="card wide">
+    <div style="text-align:center;margin-bottom:2rem">
+      <div class="logo" style="font-size:1.6rem;margin-bottom:12px">Safe<span>Space</span></div>
+      <div style="font-family:var(--serif);font-size:1.8rem;font-weight:400;margin-bottom:8px">Let's understand where you are</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">Six quick questions. No right answers.<br>This builds your personal mentor profile.</div>
+    </div>
+    <div class="pdots" id="pdots"></div>
+    <div id="q-area"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:1.5rem;align-items:center">
+      <button class="btn sm" id="btn-back" onclick="prevQ()" style="display:none">Back</button>
+      <button class="btn primary" id="btn-next" onclick="nextQ()" style="margin-left:auto">Next</button>
+    </div>
+    <div class="hint" style="margin-top:12px">Your answers are private and only used to personalise your experience</div>
+  </div>
+</div>
+
+<div id="s-dash" class="screen">
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="logo" style="font-size:1.4rem;margin-bottom:6px;padding:0 4px">Safe<span>Space</span></div>
+      <div class="uinfo">
+        <div class="uname" id="sb-name">—</div>
+        <div class="uday">Day <span id="sb-day">1</span> of your journey</div>
+        <div class="tpill free" id="sb-tier">Free</div>
+      </div>
+      <nav class="nav">
+        <div class="ni active" onclick="dtab('mentor')" id="nav-mentor"><span class="nicon">◎</span>Mentor</div>
+        <div class="ni" onclick="dtab('checkin')" id="nav-checkin"><span class="nicon">○</span>Check-in</div>
+        <div class="ni" onclick="dtab('bio')" id="nav-bio"><span class="nicon">◈</span>My Profile</div>
+        <div class="ni" onclick="dtab('progress')" id="nav-progress"><span class="nicon">◇</span>Progress</div>
+        <div class="ni" onclick="dtab('upgrade')" id="nav-upgrade"><span class="nicon">✦</span>Upgrade</div>
+      </nav>
+      <div class="sbot"><button class="btn sm full" onclick="signout()">Sign out</button></div>
+    </div>
+    <div class="main">
+
+      <div id="t-mentor" style="display:flex;flex-direction:column;height:100%">
+        <div class="mhead"><h1>Your mentor</h1><span style="font-size:12px;color:var(--muted)">SafeSpace AI</span></div>
+        <div class="mbody" style="display:flex;flex-direction:column;overflow:hidden;padding-bottom:0">
+          <div class="crisis-bar" id="crisis-bar"><strong>We see you.</strong> If thoughts of ending your life are coming up — <a onclick="openCrisisModal()">click here for immediate support</a> or call <strong>Lifeline 13 11 14</strong> right now.</div>
+          <div class="chat-wrap">
+            <div class="msgs" id="chat-msgs"></div>
+            <div id="thinking" style="display:none"><div class="thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+            <div class="cinput">
+              <div class="crow">
+                <textarea id="chat-in" rows="2" placeholder="What's on your mind right now... (Enter to send)"></textarea>
+                <button class="btn primary" onclick="send()">Send</button>
+              </div>
+              <div id="limit-msg" style="display:none;margin-top:10px;background:var(--bg2);border:1px solid var(--accent);border-radius:12px;padding:16px 18px">
+                <div style="font-family:var(--serif);font-size:1.1rem;margin-bottom:6px">You have reached your 15 message limit</div>
+                <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6">Upgrade to Pro for unlimited conversations, your full deep profile, pattern insights, and 1-on-1 sessions with Antony.</div>
+                <button onclick="goToStripe()" style="width:100%;background:var(--accent);border:none;border-radius:8px;padding:12px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--sans)">Upgrade to Pro — $19/month →</button>
+                <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted)">7-day free trial · No credit card needed · Cancel anytime</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="t-checkin" style="display:none;flex-direction:column;height:100%">
+        <div class="mhead"><h1>Daily check-in</h1></div>
+        <div class="mbody">
+          <div class="cicard">
+            <h2>How are you right now?</h2>
+            <div class="mgrid">
+              <button class="mbtn" onclick="pmood(this,'overwhelmed')">Overwhelmed</button>
+              <button class="mbtn" onclick="pmood(this,'anxious')">Anxious</button>
+              <button class="mbtn" onclick="pmood(this,'stuck')">Stuck</button>
+              <button class="mbtn" onclick="pmood(this,'numb')">Numb</button>
+              <button class="mbtn" onclick="pmood(this,'low')">Low</button>
+              <button class="mbtn" onclick="pmood(this,'flat')">Flat</button>
+              <button class="mbtn" onclick="pmood(this,'okay')">Okay</button>
+              <button class="mbtn" onclick="pmood(this,'hopeful')">Hopeful</button>
+            </div>
+            <div class="field"><label>What thought is loudest right now?</label><textarea id="ci-thought" rows="4" placeholder="Whatever keeps looping..."></textarea></div>
+            <button class="btn primary full" onclick="submitCI()" style="margin-top:8px">Submit check-in</button>
+            <div class="ciresp" id="ci-resp"><div id="ci-text"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="t-bio" style="display:none;flex-direction:column;height:100%">
+        <div class="mhead"><h1>My profile</h1><button class="btn sm teal" id="bio-refresh" onclick="genBio(true)" style="display:none">Refresh</button></div>
+        <div class="mbody">
+          <div class="bempty" id="bio-empty"><p>Your profile builds as we talk.<br>Complete onboarding and have a few conversations — the AI will generate a deep analysis of your patterns, what you're avoiding, and your path forward.</p><button class="btn primary" onclick="dtab('mentor')">Start talking →</button></div>
+          <div id="bio-content" style="display:none">
+            <div class="bsec"><h2>What your mentor sees</h2><div class="bnarr" id="bio-narr"></div></div>
+            <div class="bsec"><h2>The hidden truths</h2><p style="font-size:13px;color:var(--muted);margin-bottom:1rem;line-height:1.6">Patterns detected from everything you've shared. Mirrors, not judgements.</p><div id="bio-truths"></div></div>
+            <div class="bsec"><h2>Your specific path forward</h2><div id="bio-path" style="font-size:14px;line-height:1.8"></div></div>
+            <div style="text-align:center;padding:1rem 0"><div style="font-size:12px;color:var(--muted)">Updated: <span id="bio-date">—</span></div></div>
+          </div>
+          <div id="bio-gen" style="display:none"><div class="bsec"><div class="bgen"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="margin-left:8px">Building your profile...</span></div></div></div>
+        </div>
+      </div>
+
+      <div id="t-progress" style="display:none;flex-direction:column;height:100%">
+        <div class="mhead"><h1>Progress</h1></div>
+        <div class="mbody">
+          <div class="sgrid">
+            <div class="scard"><div class="snum" id="p-days">1</div><div class="slbl">Days in</div></div>
+            <div class="scard"><div class="snum" id="p-ci">0</div><div class="slbl">Check-ins</div></div>
+            <div class="scard"><div class="snum" id="p-msgs">0</div><div class="slbl">Exchanges</div></div>
+          </div>
+          <div class="bsum" id="bio-sum" onclick="dtab('bio')" style="display:none"><div class="bsuml">Your mentor's read on you →</div><div style="font-size:13px" id="bio-sum-text"></div></div>
+          <div class="psec"><h2>Where you're growing</h2>
+            <div class="prow"><div class="plrow"><span>Loop awareness</span><span id="pct-a">20%</span></div><div class="pbar"><div class="pfill" id="pb-a" style="width:20%"></div></div></div>
+            <div class="prow"><div class="plrow"><span>Self-compassion</span><span id="pct-s">15%</span></div><div class="pbar"><div class="pfill" id="pb-s" style="width:15%"></div></div></div>
+            <div class="prow"><div class="plrow"><span>Forward momentum</span><span id="pct-m">10%</span></div><div class="pbar"><div class="pfill" id="pb-m" style="width:10%"></div></div></div>
+          </div>
+          <div class="mlog"><h2>Mood history</h2><div id="mlog-list" style="font-size:13px;color:var(--muted)">No check-ins yet.</div></div>
+        </div>
+      </div>
+
+      <div id="t-upgrade" style="display:none;flex-direction:column;height:100%">
+        <div class="mhead"><h1>Upgrade</h1></div>
+        <div class="mbody">
+          <div class="uhero"><h1>Unlock the full experience</h1><p>Built by someone who lost everything and rebuilt from zero.<br>For people ready to stop surviving and start becoming.</p></div>
+          <div class="pgrid">
+            <div class="pcard"><div class="pname">Free</div><div class="pprice">$0</div><div class="pper">Always free</div><ul class="pfeats"><li class="on">15 messages/day</li><li class="on">Daily check-in</li><li class="on">Basic profile</li><li class="on">Crisis support always on</li><li>Unlimited messages</li><li>Full deep profile</li><li>1-on-1 with Antony</li><li>Community</li></ul></div>
+            <div class="pcard feat"><div class="pname" style="color:var(--accent2)">Pro</div><div class="pprice">$19<span>/mo</span></div><div class="pper">After 7-day free trial</div><ul class="pfeats"><li class="on">15 messages/day</li><li class="on">Daily check-in</li><li class="on">Basic profile</li><li class="on">Crisis support always on</li><li class="on">Unlimited messages</li><li class="on">Full deep profile</li><li class="on">1-on-1 with Antony</li><li class="on">Community</li></ul></div>
+          </div>
+          <button class="btn primary full" onclick="goToStripe()" style="margin-bottom:10px">Start free 7-day trial — then $19/month</button>
+          <div class="hint" style="margin-bottom:12px">7-day free trial · Cancel anytime · Built on lived experience</div>
+          <div style="text-align:center;margin-top:10px"><span style="font-size:12px;color:var(--muted);cursor:pointer" onclick="document.getElementById('paid-confirm').style.display='block'">Already paid? Click here</span></div>
+          <div id="paid-confirm" style="display:none;background:var(--bg2);border:1px solid rgba(78,205,196,0.3);border-radius:var(--rads);padding:14px;text-align:center;margin-top:8px">
+            <div style="font-size:13px;color:var(--teal);margin-bottom:8px">Already completed payment?</div>
+            <button class="btn teal full" onclick="confirmPayment()">Activate my Pro account</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL='https://igwkamkzwwobcgvpcsjs.supabase.co';
+const SB_KEY='sb_publishable_yk1mwztpshBlXqhUDoHoLg_08IEXYi8';
+const STRIPE_LINK='https://buy.stripe.com/test_4gMfZg0JpftQeMwaaw9sk00';
+const CRISIS_WORDS=['suicide','suicidal','kill myself','end it all','end my life','want to die','not worth living',"can't go on",'cant go on','no reason to live','harm myself','hurt myself','better off dead','done with life','ending it','take my life','no point living'];
+const OQS=[
+  {q:"What brought you here today?",type:"choice",choices:["Lost everything I built","Can't stop the overthinking loop","Anxiety is running my life","I feel completely stuck","Low self-worth holding me back","Thinking about ending it"]},
+  {q:"How long have you been in this place?",type:"choice",choices:["A few weeks","A few months","Over a year","Most of my adult life","I don't even know anymore"]},
+  {q:"What have you lost that hurts the most?",type:"choice",choices:["A relationship or marriage","A business or career","My sense of identity","Financial security","Trust in people","My belief in myself"]},
+  {q:"When the overthinking loop starts, what does it usually circle back to?",type:"text",ph:"e.g. 'What I should have done differently'..."},
+  {q:"What does your inner critic say about you most often?",type:"text",ph:"The voice that's hardest on you — what does it say?"},
+  {q:"What would your life look like if you actually got through this?",type:"text",ph:"Even if it feels impossible — what would you want?"}
+];
+const S={uid:localStorage.getItem('ss_uid')||'',profile:null,history:[],msgCount:0,ciCount:0,moodLog:[],mood:null,oa:{},qnum:0,bio:null};
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function isCrisis(t){return CRISIS_WORDS.some(w=>t.toLowerCase().includes(w))}
+function openCrisisModal(){document.getElementById('crisis-modal').classList.add('open')}
+function closeCrisisModal(){document.getElementById('crisis-modal').classList.remove('open')}
+
+async function sendCrisisMsg(){
+  const msg=document.getElementById('crisis-msg-input').value.trim();
+  if(msg&&S.uid){
+    try{await db('/messages','POST',{user_id:S.uid,role:'user',content:'[CRISIS CHECK-IN] '+msg})}catch(e){}
+    S.history.push({role:'user',content:'[CRISIS CHECK-IN] '+msg});
+  }
+  closeCrisisModal();
+  if(document.getElementById('s-dash').classList.contains('active')){
+    dtab('mentor');
+    addMsg("I see your message. You reached out — that matters more than you know right now.\n\nPlease call Lifeline on 13 11 14 if you're in immediate danger. They're there right now, 24/7.\n\nI'm here too. Tell me what's happening.",'assistant',false);
+  }
+}
+
+async function db(path,method='GET',body=null){
+  const opts={method,headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':method==='POST'?'return=representation':''}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(SB_URL+'/rest/v1'+path,opts);
+  const text=await r.text();
+  try{return{ok:r.ok,status:r.status,data:text?JSON.parse(text):null}}
+  catch{return{ok:r.ok,status:r.status,data:text}}
+}
+
+window.addEventListener('load',async()=>{
+  const fallback=setTimeout(()=>{if(document.getElementById('s-loading').classList.contains('active'))show('s-land')},5000);
+  if(!S.uid){clearTimeout(fallback);show('s-land');return}
+  try{
+    const r=await db('/profiles?id=eq.'+S.uid+'&select=*');
+    clearTimeout(fallback);
+    if(r.ok&&r.data&&Array.isArray(r.data)&&r.data.length>0){
+      S.profile=r.data[0];S.bio=S.profile.bio||null;S.oa=S.profile.onboard_answers||{};
+      await loadHistory();
+      const answered=Object.values(S.oa).filter(v=>{if(!v)return false;return typeof v==='object'?!!v.choice:true}).length;
+      if(answered<3){show('s-onboard');renderDots();renderQ();return}
+      show('s-lock');setTimeout(()=>{const lp=document.getElementById('lock-pw');if(lp)lp.focus()},300);
+    }else{localStorage.removeItem('ss_uid');S.uid='';show('s-land')}
+  }catch(e){clearTimeout(fallback);show('s-land')}
+});
+
+async function loadHistory(){
+  try{
+    const mr=await db('/messages?user_id=eq.'+S.uid+'&order=created_at.asc&limit=60');
+    if(mr.ok&&Array.isArray(mr.data)){
+      S.history=mr.data.filter(m=>m.role&&m.content&&typeof m.content==='string'&&m.content.length>0&&m.content.length<4000).slice(-40).map(m=>({role:m.role==='ai'?'assistant':m.role,content:m.content}));
+      S.msgCount=mr.data.filter(m=>m.role==='user').length;
+    }
+    const cr=await db('/checkins?user_id=eq.'+S.uid+'&order=created_at.desc&limit=20');
+    if(cr.ok&&Array.isArray(cr.data)){S.ciCount=cr.data.length;S.moodLog=cr.data.map(c=>({mood:c.mood,thought:c.thought,date:new Date(c.created_at).toLocaleDateString('en-AU')}))}
+  }catch(e){}
+}
+
+function atab(t){
+  document.querySelectorAll('.tab-bar .tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='in')||(i===1&&t==='up')));
+  document.getElementById('f-in').style.display=t==='in'?'block':'none';
+  document.getElementById('f-up').style.display=t==='up'?'block':'none';
+}
+
+async function login(){
+  const e=document.getElementById('li-e').value.trim().toLowerCase();
+  const p=document.getElementById('li-p').value;
+  const err=document.getElementById('li-err');const btn=document.getElementById('li-btn');
+  err.style.display='none';btn.textContent='Signing in...';btn.disabled=true;
+  try{
+    const r=await db('/profiles?email=eq.'+encodeURIComponent(e)+'&select=*');
+    if(!r.ok||!r.data||r.data.length===0){err.textContent='No account found with that email.';err.style.display='block';btn.textContent='Sign in';btn.disabled=false;return}
+    const prof=r.data[0];
+    if(prof.password_hash!==p){err.textContent='Incorrect password.';err.style.display='block';btn.textContent='Sign in';btn.disabled=false;return}
+    S.uid=prof.id;localStorage.setItem('ss_uid',S.uid);
+    S.profile=prof;S.bio=prof.bio||null;S.oa=prof.onboard_answers||{};
+    await loadHistory();btn.textContent='Sign in';btn.disabled=false;
+    const answered=Object.values(S.oa).filter(v=>{if(!v)return false;return typeof v==='object'?!!v.choice:true}).length;
+    if(answered<3){show('s-onboard');renderDots();renderQ();return}
+    loadDash();
+  }catch(e2){err.textContent='Connection error.';err.style.display='block';btn.textContent='Sign in';btn.disabled=false;}
+}
+
+async function signup(){
+  const n=document.getElementById('su-n').value.trim();
+  const e=document.getElementById('su-e').value.trim().toLowerCase();
+  const p=document.getElementById('su-p').value;
+  const p2=document.getElementById('su-p2').value;
+  const err=document.getElementById('su-err');const btn=document.getElementById('su-btn');
+  err.style.display='none';
+  if(!n){err.textContent='Please enter your name.';err.style.display='block';return}
+  if(!e||!e.includes('@')){err.textContent='Please enter a valid email.';err.style.display='block';return}
+  if(p.length<6){err.textContent='Password needs to be at least 6 characters.';err.style.display='block';return}
+  if(p!==p2){err.textContent='Passwords do not match.';err.style.display='block';return}
+  btn.textContent='Creating account...';btn.disabled=true;
+  try{
+    const check=await db('/profiles?email=eq.'+encodeURIComponent(e)+'&select=id');
+    if(check.ok&&check.data&&check.data.length>0){err.textContent='An account with that email already exists.';err.style.display='block';btn.textContent='Start 7-day free trial';btn.disabled=false;return}
+    const newId=crypto.randomUUID();
+    const r=await db('/profiles','POST',{id:newId,name:n,email:e,password_hash:p,tier:'trial',day_count:1});
+    if(!r.ok){err.textContent='Signup failed — please try again.';err.style.display='block';btn.textContent='Start 7-day free trial';btn.disabled=false;return}
+    S.uid=newId;localStorage.setItem('ss_uid',newId);
+    S.profile={id:newId,name:n,email:e,password_hash:p,tier:'trial',day_count:1};S.oa={};S.qnum=0;
+    btn.textContent='Start 7-day free trial';btn.disabled=false;
+    show('s-onboard');renderDots();renderQ();
+  }catch(e2){err.textContent='Connection error.';err.style.display='block';btn.textContent='Start 7-day free trial';btn.disabled=false;}
+}
+
+async function resetPw(){
+  const e=document.getElementById('reset-e').value.trim().toLowerCase();
+  const p=document.getElementById('reset-p').value;
+  const p2=document.getElementById('reset-p2').value;
+  const err=document.getElementById('reset-err');const ok=document.getElementById('reset-ok');const btn=document.getElementById('reset-btn');
+  err.style.display='none';ok.style.display='none';
+  if(!e){err.textContent='Please enter your email.';err.style.display='block';return}
+  if(p.length<6){err.textContent='New password needs to be at least 6 characters.';err.style.display='block';return}
+  if(p!==p2){err.textContent='Passwords do not match.';err.style.display='block';return}
+  btn.textContent='Resetting...';btn.disabled=true;
+  try{
+    const r=await db('/profiles?email=eq.'+encodeURIComponent(e)+'&select=id');
+    if(!r.ok||!r.data||r.data.length===0){err.textContent='No account found with that email.';err.style.display='block';btn.textContent='Reset password';btn.disabled=false;return}
+    await db('/profiles?id=eq.'+r.data[0].id,'PATCH',{password_hash:p});
+    ok.textContent='Password updated. You can now sign in.';ok.style.display='block';
+    btn.textContent='Reset password';btn.disabled=false;
+    setTimeout(()=>show('s-auth'),2000);
+  }catch(e2){err.textContent='Connection error.';err.style.display='block';btn.textContent='Reset password';btn.disabled=false;}
+}
+
+function signout(){
+  localStorage.removeItem('ss_uid');
+  S.uid='';S.profile=null;S.history=[];S.msgCount=0;S.ciCount=0;S.moodLog=[];S.mood=null;S.bio=null;S.oa={};
+  document.getElementById('chat-msgs').innerHTML='';
+  show('s-land');
+}
+
+function unlockApp(){
+  const pw=document.getElementById('lock-pw').value;
+  const err=document.getElementById('lock-err');
+  err.style.display='none';
+  if(!pw){err.textContent='Please enter your password.';err.style.display='block';return}
+  if(pw!==S.profile.password_hash){err.textContent='Incorrect password.';err.style.display='block';return}
+  document.getElementById('lock-pw').value='';
+  loadDash();
+}
+
+function renderDots(){document.getElementById('pdots').innerHTML=OQS.map((_,i)=>'<div class="pdot '+(i<S.qnum?'done':i===S.qnum?'active':'')+'"></div>').join('')}
+
+function renderQ(){
+  const q=OQS[S.qnum];const isLast=S.qnum===OQS.length-1;
+  document.getElementById('btn-back').style.display=S.qnum>0?'block':'none';
+  document.getElementById('btn-next').textContent=isLast?'Build my profile':'Next';
+  const savedRaw=S.oa[S.qnum]||'';
+  const saved=typeof savedRaw==='object'?savedRaw:{choice:savedRaw,extra:''};
+  if(q.type==='choice'){
+    document.getElementById('q-area').innerHTML='<div style="font-size:11px;color:var(--accent2);font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Question '+(S.qnum+1)+' of '+OQS.length+'</div><div style="font-size:15px;font-weight:500;margin-bottom:12px;line-height:1.5">'+q.q+'</div><div class="choice-grid">'+OQS[S.qnum].choices.map(c=>'<button class="cbtn '+(saved.choice===c?'sel':'')+'" onclick="pc(this,\''+c.replace(/'/g,"\\'")+'\')">&nbsp;'+c+'</button>').join('')+'</div><div style="margin-top:14px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Want to add anything else? (optional)</div><textarea id="q-extra" rows="2" placeholder="Any other details you want your mentor to know..." style="font-size:13px">'+(saved.extra||'')+'</textarea></div>';
+  }else{
+    document.getElementById('q-area').innerHTML='<div style="font-size:11px;color:var(--accent2);font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Question '+(S.qnum+1)+' of '+OQS.length+'</div><div style="font-size:15px;font-weight:500;margin-bottom:12px;line-height:1.5">'+q.q+'</div><textarea id="q-ti" rows="4" placeholder="'+q.ph+'" style="margin-top:4px">'+(saved.extra||saved.choice||'')+'</textarea>';
+  }
+  renderDots();
+}
+
+function pc(btn,val){
+  document.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');
+  const ex=typeof S.oa[S.qnum]==='object'?S.oa[S.qnum].extra||'':'';
+  S.oa[S.qnum]={choice:val,extra:ex};
+}
+function prevQ(){if(S.qnum>0){S.qnum--;renderQ()}}
+
+async function nextQ(){
+  const q2=OQS[S.qnum];
+  if(q2.type==='text'){const v=document.getElementById('q-ti')?.value.trim();S.oa[S.qnum]={choice:v,extra:''};}
+  else{const ex=document.getElementById('q-extra')?.value.trim()||'';const existing=typeof S.oa[S.qnum]==='object'?S.oa[S.qnum]:{choice:S.oa[S.qnum]||'',extra:''};S.oa[S.qnum]={...existing,extra:ex};}
+  const ans=typeof S.oa[S.qnum]==='object'?S.oa[S.qnum].choice:S.oa[S.qnum];
+  if(!ans){alert('Please select an answer before continuing.');return}
+  if(S.qnum<OQS.length-1){S.qnum++;renderQ();return}
+  const btn=document.getElementById('btn-next');
+  btn.textContent='Saving...';btn.disabled=true;
+  try{await db('/profiles?id=eq.'+S.uid,'PATCH',{onboard_answers:S.oa});S.profile.onboard_answers=S.oa;}catch(e){}
+  btn.textContent='Build my profile';btn.disabled=false;
+  loadDash();
+  setTimeout(()=>genBio(false),2000);
+}
+
+function loadDash(){
+  const p=S.profile;if(!p){show('s-land');return}
+  const h=new Date().getHours();
+  const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('sb-name').textContent=g+', '+p.name;
+  document.getElementById('sb-day').textContent=p.day_count;
+  document.getElementById('p-days').textContent=p.day_count;
+  document.getElementById('p-ci').textContent=S.ciCount;
+  document.getElementById('p-msgs').textContent=S.msgCount;
+  const tb=document.getElementById('sb-tier');
+  tb.textContent=p.tier==='trial'?'7-Day Trial':p.tier==='pro'?'Pro Member':'Free';
+  tb.className='tpill '+(p.tier==='pro'?'pro':p.tier==='trial'?'trial':'free');
+  updateMoodLog();updateProgress();
+  if(S.bio)renderBio(S.bio);
+  show('s-dash');dtab('mentor');
+  if(S.history.length===0){addWelcome(p.name);}
+  else{
+    const wrap=document.getElementById('chat-msgs');
+    S.history.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.role==='assistant'?'assistant':'user');d.textContent=m.content;wrap.appendChild(d)});
+    setTimeout(()=>{wrap.scrollTop=wrap.scrollHeight},100);
+  }
+}
+
+function dtab(t){
+  ['mentor','checkin','bio','progress','upgrade'].forEach(x=>{
+    document.getElementById('t-'+x).style.display=x===t?'flex':'none';
+    document.getElementById('nav-'+x).classList.toggle('active',x===t);
+  });
+}
+
+function addWelcome(name){
+  const o=S.oa;const sit0=o[0]||'';const sit=typeof sit0==='object'?sit0.choice:sit0;
+  const msg=Object.values(o).filter(v=>v).length>2
+    ?'Hey '+name+'. I\'ve read through what you shared.\n\n'+(sit?'"'+sit+'" — that\'s a heavy thing to be carrying.':'What you shared takes real honesty.')+'\n\nI\'m building your profile in the background. The more we talk, the sharper it gets.\n\nWhat\'s the loudest thing right now?'
+    :'Hey '+name+'. Really glad you\'re here.\n\nThis space is for people in the hard place — the overthinking loop, anxiety, low self-worth, feeling like you\'ll never get out.\n\nI\'ve been there. Not theoretically. Actually there.\n\nWhat\'s going on for you right now?';
+  addMsg(msg,'assistant',false);
+}
+
+function buildSys(){
+  try{
+    const o=S.oa;
+    const oc=Object.keys(o).length>0?'\n\nONBOARDING:\n'+OQS.map((q,i)=>{const a=o[i];if(!a)return'';const c=typeof a==='object'?a.choice:a;const ex=typeof a==='object'&&a.extra?' (added: '+a.extra+')':'';return c?'- '+q.q+': '+c+ex:''}).filter(Boolean).join('\n'):'';
+    const bc=S.bio&&S.bio.raw?'\n\nCLIENT PROFILE:\n'+S.bio.raw:'';
+    const name=S.profile?S.profile.name:'User';
+    const tier=S.profile?S.profile.tier:'free';
+    const day=S.profile?S.profile.day_count:1;
+    return 'You are the AI voice of SafeSpace, a peer mentorship platform founded by Antony, a man in his early 50s who lost everything and is rebuilding from nothing. You carry his lived experience, not clinical distance.\n\nYour users are people trapped in the overthinking loop. Some may be contemplating ending their life.\n\nCRITICAL SAFETY: If the user expresses suicidal ideation or self-harm, lead with deep warmth, validate their pain, then provide: Lifeline Australia 13 11 14, Beyond Blue 1300 22 4636. Stay present. Never go clinical.\n\nYOUR PHILOSOPHICAL VOICE — draw on these thinkers naturally, never by name-dropping:\n- Nietzsche: amor fati, meaning through suffering, will to self-mastery\n- Jung: shadow integration, unconscious patterns, what you resist persists\n- Jim Rohn: personal philosophy as foundation of results, discipline bridges goals and results\n- Bob Proctor: paradigm shifts, subconscious programming installed before conscious choice\n- Machiavelli: strategic realism, the world as it is not as we wish it were\n\nYOUR VOICE: Direct, warm, grounded in lived experience. Never therapy-speak. Ask ONE powerful question max per response. Reflect their exact words back. Under 120 words unless emotional weight demands more. Name the loop gently. Celebrate micro-wins. Challenge gently when it serves them.\n\nUser: '+name+' | Tier: '+tier+' | Day: '+day+oc+bc;
+  }catch(e){
+    return 'You are a warm, direct peer mentor at SafeSpace. Help the user with honesty, care, and lived experience. Ask one powerful question at a time.';
+  }
+}
+
+async function addMsg(text,role,save){
+  if(save===undefined)save=true;
+  const wrap=document.getElementById('chat-msgs');
+  const d=document.createElement('div');
+  d.className='msg '+(role==='assistant'?'assistant':'user');
+  d.textContent=text;
+  wrap.appendChild(d);
+  setTimeout(()=>{wrap.scrollTop=wrap.scrollHeight},50);
+  if(save&&S.uid){
+    try{await db('/messages','POST',{user_id:S.uid,role:role,content:text})}catch(e){}
+  }
+  if(role==='user'){
+    S.msgCount++;
+    document.getElementById('p-msgs').textContent=S.msgCount;
+    updateProgress();
+    if(S.msgCount===3&&!S.bio)genBio(false);
+    if(S.msgCount>3&&S.msgCount%6===0)genBio(false);
+  }
+}
+
+async function send(){
+  const inp=document.getElementById('chat-in');
+  const text=inp.value.trim();
+  if(!text)return;
+  if(S.profile&&S.profile.tier==='free'&&S.msgCount>=15){
+    document.getElementById('limit-msg').style.display='block';return;
+  }
+  inp.value='';
+  await addMsg(text,'user');
+  S.history.push({role:'user',content:text});
+  if(isCrisis(text)){document.getElementById('crisis-bar').style.display='block';openCrisisModal();}
+  document.getElementById('thinking').style.display='block';
+  try{
+    const sysPrompt=buildSys();
+    const msgs=[{role:'system',content:sysPrompt}];
+    const hist=S.history.filter(m=>m.role&&m.content&&typeof m.content==='string'&&m.content.length>0&&m.content.length<4000).slice(-38);
+    for(const m of hist){
+      const role=m.role==='ai'?'assistant':m.role;
+      if(role==='user'||role==='assistant')msgs.push({role:role,content:m.content});
+    }
+    const r=await fetch('/.netlify/functions/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:msgs})
+    });
+    const data=await r.json();
+    document.getElementById('thinking').style.display='none';
+    if(!r.ok||data.error){
+      await addMsg("I hit a snag — still here with you. Try sending again.",'assistant');return;
+    }
+    const reply=data.reply||"I'm here. Take your time.";
+    await addMsg(reply,'assistant');
+    S.history.push({role:'assistant',content:reply});
+  }catch(e){
+    document.getElementById('thinking').style.display='none';
+    await addMsg('Connection dropped — still here. Check your internet and try again.','assistant');
+  }
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey&&document.activeElement===document.getElementById('chat-in')){e.preventDefault();send();}
+  if(e.key==='Enter'&&document.activeElement===document.getElementById('lock-pw')){e.preventDefault();unlockApp();}
+});
+
+function pmood(btn,mood){document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');S.mood=mood;}
+
+async function submitCI(){
+  if(!S.mood){alert('Please select how you are feeling first.');return}
+  const thought=document.getElementById('ci-thought').value.trim();
+  if(isCrisis(thought)){document.getElementById('crisis-bar').style.display='block';openCrisisModal();return}
+  try{await db('/checkins','POST',{user_id:S.uid,mood:S.mood,thought})}catch(e){}
+  S.ciCount++;S.moodLog.unshift({mood:S.mood,thought,date:new Date().toLocaleDateString('en-AU')});
+  document.getElementById('p-ci').textContent=S.ciCount;updateMoodLog();updateProgress();
+  const cr=document.getElementById('ci-resp');const ct=document.getElementById('ci-text');
+  cr.style.display='block';ct.textContent='Reading you...';
+  try{
+    const r=await fetch('/.netlify/functions/checkin',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:S.profile?S.profile.name:'friend',day:S.profile?S.profile.day_count:1,mood:S.mood,thought:thought})
+    });
+    const data=await r.json();
+    ct.textContent=data.reply||'Checking in is courage. It matters.';
+    if(S.ciCount%2===0)genBio(false);
+  }catch(e){ct.textContent='Checking in is courage. Whatever mood brought you here — it matters.';}
+}
+
+async function genBio(manual){
+  const hasData=S.msgCount>=2||Object.keys(S.oa).length>=3||S.ciCount>=1;
+  if(!hasData&&!manual)return;
+  document.getElementById('bio-empty').style.display='none';
+  document.getElementById('bio-content').style.display='none';
+  document.getElementById('bio-gen').style.display='block';
+  document.getElementById('bio-refresh').style.display='none';
+  const os=OQS.map((q,i)=>{const a=S.oa[i];if(!a)return'';const c=typeof a==='object'?a.choice:a;const ex=typeof a==='object'&&a.extra?' (added: '+a.extra+')':'';return c?q.q+': '+c+ex:''}).filter(Boolean).join('\n')||'No onboarding yet';
+  const cs=S.history.slice(-20).map(m=>(m.role==='user'?'Client':'Mentor')+': '+m.content).join('\n')||'No conversations yet';
+  const ms=S.moodLog.slice(0,10).map(m=>m.date+': '+m.mood+(m.thought?' — "'+m.thought+'"':'')).join('\n')||'No check-ins yet';
+  try{
+    const r=await fetch('/.netlify/functions/bio',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({onboarding:os,conversations:cs,moodlog:ms})
+    });
+    const data=await r.json();
+    if(!r.ok||!data.bio)throw new Error('Bio failed');
+    const bio=data.bio;
+    S.bio=bio;
+    try{await db('/profiles?id=eq.'+S.uid,'PATCH',{bio:bio})}catch(e){}
+    renderBio(bio);
+  }catch(e){
+    document.getElementById('bio-gen').style.display='none';
+    document.getElementById('bio-empty').style.display='block';
+    document.getElementById('bio-empty').innerHTML='<p>Keep talking — your profile builds after a few more exchanges.</p><button class="btn primary" onclick="dtab(\'mentor\')">Keep talking →</button>';
+  }
+}
+
+function renderBio(bio){
+  document.getElementById('bio-gen').style.display='none';
+  document.getElementById('bio-empty').style.display='none';
+  document.getElementById('bio-content').style.display='block';
+  document.getElementById('bio-refresh').style.display='block';
+  document.getElementById('bio-narr').textContent=bio.narrative||'';
+  document.getElementById('bio-date').textContent=bio.generatedAt||'Just now';
+  document.getElementById('bio-path').textContent=bio.path||'';
+  document.getElementById('bio-truths').innerHTML=[
+    {label:'belief',title:'Core belief',text:bio.belief},
+    {label:'avoiding',title:"What you're avoiding",text:bio.avoiding},
+    {label:'patterns',title:'Repeating patterns',text:bio.patterns}
+  ].map(t=>'<div class="tcard"><div class="tlabel '+t.label+'">'+t.title+'</div><div class="ttext">'+(t.text||'—')+'</div></div>').join('');
+  if(bio.summary){document.getElementById('bio-sum').style.display='block';document.getElementById('bio-sum-text').textContent=bio.summary;}
+}
+
+function updateMoodLog(){
+  const el=document.getElementById('mlog-list');
+  if(!S.moodLog.length){el.textContent='No check-ins yet.';return}
+  el.innerHTML=S.moodLog.slice(0,8).map(m=>'<div class="mentry"><span style="text-transform:capitalize">'+m.mood+'</span><span style="color:var(--muted)">'+m.date+'</span></div>').join('');
+}
+
+function updateProgress(){
+  const a=Math.min(20+S.ciCount*12,88),sc=Math.min(15+S.msgCount*4,88),mo=Math.min(10+(S.msgCount+S.ciCount)*5,88);
+  document.getElementById('pb-a').style.width=a+'%';document.getElementById('pct-a').textContent=Math.round(a)+'%';
+  document.getElementById('pb-s').style.width=sc+'%';document.getElementById('pct-s').textContent=Math.round(sc)+'%';
+  document.getElementById('pb-m').style.width=mo+'%';document.getElementById('pct-m').textContent=Math.round(mo)+'%';
+}
+
+function goToStripe(){
+  const email=S.profile?S.profile.email:'';
+  window.open(STRIPE_LINK+(email?'?prefilled_email='+encodeURIComponent(email):''),'_blank');
+}
+
+async function confirmPayment(){
+  if(!S.uid)return;
+  try{await db('/profiles?id=eq.'+S.uid,'PATCH',{tier:'pro'})}catch(e){}
+  if(S.profile)S.profile.tier='pro';
+  const tb=document.getElementById('sb-tier');tb.textContent='Pro Member';tb.className='tpill pro';
+  dtab('mentor');
+  addMsg("Welcome to Pro, "+S.profile.name+". Unlimited access — full mentor, deep profile, pattern insights, and 1-on-1 sessions when you're ready.\n\nYou made a real investment in yourself today. That matters.\n\nNow — where were we?",'assistant');
+}
+
+async function startTrial(){
+  if(!S.uid)return;
+  try{await db('/profiles?id=eq.'+S.uid,'PATCH',{tier:'trial'})}catch(e){}
+  if(S.profile)S.profile.tier='trial';
+  const tb=document.getElementById('sb-tier');tb.textContent='7-Day Trial';tb.className='tpill trial';
+  dtab('mentor');
+  addMsg("Your 7-day trial is live — unlimited access, full mentor, deep profile.\n\nNo card charged until the trial ends. Cancel anytime.\n\nNow — where were we?",'assistant');
+}
+</script>
+</body>
+</html>
